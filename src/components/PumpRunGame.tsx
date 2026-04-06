@@ -31,7 +31,12 @@ function saveBest(n: number) {
 
 const TICKERS = ["MOON", "WAGMI", "HODL", "LFG", "GG", "SEND IT", "UP ONLY"];
 
-export function PumpRunGame() {
+type PumpRunGameProps = {
+  /** Fires when a round starts (user gesture — e.g. unlock background audio). */
+  onRoundStart?: () => void;
+};
+
+export function PumpRunGame({ onRoundStart }: PumpRunGameProps) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [price, setPrice] = useState(START_PRICE);
   const [peak, setPeak] = useState(START_PRICE);
@@ -91,6 +96,7 @@ export function PumpRunGame() {
   }, [phase, endGame]);
 
   const start = useCallback(() => {
+    onRoundStart?.();
     endedRef.current = false;
     peakRef.current = START_PRICE;
     setPrice(START_PRICE);
@@ -98,7 +104,7 @@ export function PumpRunGame() {
     setTimeLeftMs(GAME_MS);
     startRef.current = Date.now();
     setPhase("playing");
-  }, []);
+  }, [onRoundStart]);
 
   const pump = useCallback(() => {
     if (phase !== "playing") return;
@@ -117,7 +123,7 @@ export function PumpRunGame() {
   return (
     <div className="flex flex-1 flex-col gap-4">
       <div
-        className="overflow-hidden rounded-lg border border-pump-dim bg-black/40 py-2 text-center font-mono text-xs text-pump-green/90"
+        className="overflow-hidden rounded-lg border border-zinc-200 bg-white/90 py-2 text-center font-mono text-xs text-zinc-600 shadow-sm backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-400 dark:shadow-none"
         aria-hidden
       >
         <span className="inline-block animate-pulse">
@@ -125,19 +131,22 @@ export function PumpRunGame() {
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl border border-pump-dim bg-gradient-to-b from-pump-dim/50 to-black/60 p-4">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl border border-zinc-200 bg-zinc-50/90 p-4 shadow-sm backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/60 dark:shadow-none">
         <div className="w-full text-center">
-          <p className="text-xs uppercase tracking-widest text-zinc-500">Peak price</p>
-          <p className="mt-1 font-mono text-5xl font-extrabold tabular-nums text-pump-green md:text-6xl">
+          <p className="text-xs uppercase tracking-widest text-zinc-500 dark:text-zinc-500">
+            Peak price
+          </p>
+          <p className="mt-1 font-mono text-5xl font-extrabold tabular-nums text-zinc-900 dark:text-white md:text-6xl">
             {showPeak ? peak.toFixed(1) : "—"}
           </p>
-          <p className="mt-2 font-mono text-sm text-zinc-400">
-            Current: <span className="text-zinc-200">{price.toFixed(1)}</span>
+          <p className="mt-2 font-mono text-sm text-zinc-600 dark:text-zinc-400">
+            Current:{" "}
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">{price.toFixed(1)}</span>
           </p>
         </div>
 
         {phase === "playing" && (
-          <p className="font-mono text-2xl font-bold tabular-nums text-pump-pink">
+          <p className="font-mono text-2xl font-bold tabular-nums text-zinc-800 dark:text-zinc-200">
             {seconds}s
           </p>
         )}
@@ -146,7 +155,7 @@ export function PumpRunGame() {
           <button
             type="button"
             onClick={start}
-            className="w-full max-w-sm rounded-xl bg-pump-green px-6 py-5 font-mono text-lg font-bold text-black shadow-[0_0_24px_rgba(0,255,136,0.35)] transition active:scale-[0.98] md:text-xl"
+            className="w-full max-w-sm rounded-xl bg-zinc-900 px-6 py-5 font-mono text-lg font-bold text-white shadow-sm transition active:scale-[0.98] dark:bg-white dark:text-zinc-950 md:text-xl"
           >
             START PUMP
           </button>
@@ -157,7 +166,7 @@ export function PumpRunGame() {
             type="button"
             onClick={pump}
             style={{ touchAction: "manipulation" }}
-            className="flex min-h-[120px] w-full max-w-sm select-none items-center justify-center rounded-2xl bg-gradient-to-br from-pump-pink to-orange-600 px-4 py-8 font-mono text-2xl font-extrabold uppercase tracking-wide text-white shadow-[0_0_32px_rgba(255,0,170,0.35)] active:scale-[0.97] md:min-h-[140px] md:text-3xl"
+            className="flex min-h-[120px] w-full max-w-sm select-none items-center justify-center rounded-2xl border border-zinc-300 bg-zinc-100 px-4 py-8 font-mono text-2xl font-extrabold uppercase tracking-wide text-zinc-900 shadow-sm active:scale-[0.97] dark:border-zinc-600 dark:bg-zinc-800 dark:text-white md:min-h-[140px] md:text-3xl"
           >
             PUMP
           </button>
@@ -165,17 +174,18 @@ export function PumpRunGame() {
 
         {phase === "ended" && (
           <div className="w-full max-w-sm space-y-4 text-center">
-            <p className="font-mono text-zinc-300">
+            <p className="font-mono text-zinc-700 dark:text-zinc-300">
               Round high:{" "}
-              <span className="text-pump-green">{Math.floor(peak)}</span>
+              <span className="font-semibold text-zinc-900 dark:text-white">{Math.floor(peak)}</span>
             </p>
             <p className="font-mono text-sm text-zinc-500">
-              Best ever: <span className="text-zinc-300">{best}</span>
+              Best ever:{" "}
+              <span className="font-medium text-zinc-800 dark:text-zinc-200">{best}</span>
             </p>
             <button
               type="button"
               onClick={start}
-              className="w-full rounded-xl border border-pump-green/50 bg-pump-green/10 px-6 py-4 font-mono text-lg font-bold text-pump-green transition active:scale-[0.98]"
+              className="w-full rounded-xl border border-zinc-300 bg-transparent px-6 py-4 font-mono text-lg font-bold text-zinc-900 transition active:scale-[0.98] dark:border-zinc-600 dark:text-white"
             >
               PLAY AGAIN
             </button>
@@ -183,7 +193,7 @@ export function PumpRunGame() {
         )}
       </div>
 
-      <p className="text-center text-[11px] leading-relaxed text-zinc-600">
+      <p className="text-center text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-600">
         For fun only. No blockchain, no tokens, no real money.
       </p>
     </div>

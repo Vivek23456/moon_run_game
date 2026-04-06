@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  color-scheme: light dark;
+}
+
 html,
 body,
 #root {
@@ -12,6 +16,7 @@ body,
 }
 
 body {
-  @apply bg-pump-bg text-zinc-100 antialiased;
+  @apply bg-white text-zinc-900 antialiased;
+  @apply dark:bg-zinc-950 dark:text-zinc-100;
   -webkit-tap-highlight-color: transparent;
 }
