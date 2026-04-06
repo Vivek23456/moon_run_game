@@ -1,18 +1,23 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { PumpRunGame } from "./components/PumpRunGame";
-import { YouTubeBackground } from "./components/YouTubeBackground";
+import {
+  YouTubeBackground,
+  type DemonPlayerControls,
+} from "./components/YouTubeBackground";
 
 const BG_VIDEO_ID = "qF0PdgefNMY";
 
 export default function App() {
-  const unmuteRef = useRef<(() => void) | null>(null);
+  const demonRef = useRef<DemonPlayerControls | null>(null);
+  const [demonReady, setDemonReady] = useState(false);
 
-  const handlePlayerReady = useCallback((controls: { unmute: () => void }) => {
-    unmuteRef.current = controls.unmute;
+  const handlePlayerReady = useCallback((controls: DemonPlayerControls) => {
+    demonRef.current = controls;
+    setDemonReady(true);
   }, []);
 
   const handleRoundStart = useCallback(() => {
-    unmuteRef.current?.();
+    demonRef.current?.unmute();
   }, []);
 
   return (
@@ -29,6 +34,24 @@ export default function App() {
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
           Tap fast. Fake numbers only. Not financial advice.
         </p>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+          <button
+            type="button"
+            disabled={!demonReady}
+            onClick={() => demonRef.current?.play()}
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-zinc-900 shadow-sm transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            play the demon
+          </button>
+          <button
+            type="button"
+            disabled={!demonReady}
+            onClick={() => demonRef.current?.pause()}
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-zinc-900 shadow-sm transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            stop the demon
+          </button>
+        </div>
       </header>
       <main className="relative z-10 flex flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <PumpRunGame onRoundStart={handleRoundStart} />

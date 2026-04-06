@@ -4,6 +4,7 @@ const BG_PLAYER_ID = "yt-bg-player";
 
 type YTPlayerInstance = {
   playVideo: () => void;
+  pauseVideo: () => void;
   unMute: () => void;
   setVolume: (v: number) => void;
   destroy: () => void;
@@ -47,9 +48,15 @@ function ensureYoutubeApi(): Promise<void> {
   return youtubeApiPromise;
 }
 
+export type DemonPlayerControls = {
+  unmute: () => void;
+  play: () => void;
+  pause: () => void;
+};
+
 type Props = {
   videoId: string;
-  onPlayerReady?: (controls: { unmute: () => void }) => void;
+  onPlayerReady?: (controls: DemonPlayerControls) => void;
 };
 
 export function YouTubeBackground({ videoId, onPlayerReady }: Props) {
@@ -88,7 +95,11 @@ export function YouTubeBackground({ videoId, onPlayerReady }: Props) {
               e.target.unMute();
               e.target.setVolume(100);
             };
-            onPlayerReadyRef.current?.({ unmute });
+            onPlayerReadyRef.current?.({
+              unmute,
+              play: () => e.target.playVideo(),
+              pause: () => e.target.pauseVideo(),
+            });
           },
         },
       });
