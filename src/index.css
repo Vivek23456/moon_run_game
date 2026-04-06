@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  min-height: 100svh;
+  min-height: 100dvh;
+}
+
+body {
+  @apply bg-pump-bg text-zinc-100 antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
